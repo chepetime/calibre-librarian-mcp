@@ -2,6 +2,29 @@
 
 ## Completed Tasks
 
+### 2026-01-19: Implement compare_books tool (Phase 3)
+- Created `src/tools/compare-books.ts`
+- Compare 2-5 books side-by-side in table format
+- Highlights matching vs differing fields
+- Optional field selection
+- Recommendations for handling differences
+- Commit: 8fe3bf5
+
+### 2026-01-19: Implement find_duplicates tool (Phase 3)
+- Created `src/tools/find-duplicates.ts`
+- Three modes: title, author_title, identifier
+- Configurable similarity threshold (0-1)
+- Can check specific book or scan entire library
+- Groups duplicates with reason for flagging
+- Commit: 2ace854
+
+### 2026-01-19: Add feature flag for write operations (Phase 3)
+- Added CALIBRE_ENABLE_WRITE_OPERATIONS env var to config.ts
+- Default: false (disabled for safety)
+- assertWriteEnabled() check in set_metadata and set_custom_column
+- Updated .env.example with documentation
+- Commit: a8fb13a
+
 ### 2026-01-19: Implement set_metadata tool (Phase 3)
 - Created `src/tools/set-metadata.ts`
 - Supports title, authors, tags, series, publisher, rating, comments, languages
@@ -218,11 +241,11 @@
 
 ### Metadata Editing
 - [x] `setMetadata` - Update book metadata fields (guarded)
-- [ ] Feature flag for enabling write operations
+- [x] Feature flag for enabling write operations (CALIBRE_ENABLE_WRITE_OPERATIONS)
 
 ### Cleanup & Duplicate Workbench
-- [ ] Duplicate detection helper
-- [ ] Metadata comparison tool
+- [x] Duplicate detection helper (`find_duplicates`)
+- [x] Metadata comparison tool (`compare_books`)
 - [ ] Guided merge/retag workflow
 - [ ] Book quality reports (missing covers, formats, metadata gaps)
 
@@ -236,15 +259,14 @@
 
 ## Phase 4: Packaging & Deployment
 
-### Transport Options
-- [ ] HTTP transport (parity with Python server)
-- [ ] Docker recipe / Dockerfile
-- [ ] XMCP cloud deployment docs
-
 ### Platform UX
-- [ ] Auto-detect `calibredb` paths (Windows support)
+- [x] Auto-detect `calibredb` paths (Windows, macOs, linux support)
 - [ ] Claude Desktop config generator/helper
 - [ ] MCP Inspector verification guide
+- [ ] Docker recipe / Dockerfile
+- [ ] Improve MCP performance
+- [ ] Improve testing
+- [ ] Improve documentation
 
 ### Documentation
 - [ ] README.md with full setup instructions
