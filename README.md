@@ -12,7 +12,7 @@
         "/Users/jose/Projects/personal/new-mcp-calibre/calibre-librarian-mcp/dist/stdio.js"
       ],
       "env": {
-        "CALIBRE_LIBRARY_PATH": "/Users/jose/Library/CloudStorage/GoogleDrive-chepe.time@gmail.com/Mi unidad/Calibre",
+        "CALIBRE_LIBRARY_PATH": "",
         "CALIBRE_DB_COMMAND": "/opt/homebrew/bin/calibredb"
       }
     }
