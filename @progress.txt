@@ -2,6 +2,46 @@
 
 ## Completed Tasks
 
+### 2026-01-19: Implement set_metadata tool (Phase 3)
+- Created `src/tools/set-metadata.ts`
+- Supports title, authors, tags, series, publisher, rating, comments, languages
+- Marked as destructive (destructiveHint: true)
+- Only updates specified fields, preserves others
+- Reports summary of changes applied
+- Commit: 3dffff3
+
+### 2026-01-19: Implement set_custom_column tool (Phase 3)
+- Created `src/tools/set-custom-column.ts`
+- Marked as destructive (destructiveHint: true)
+- Verifies book exists before update
+- Supports append mode for multi-value columns
+- Reads back value to confirm change
+- Commit: 6f87e62
+
+### 2026-01-19: Implement get_custom_columns tool (Phase 3)
+- Created `src/tools/get-custom-columns.ts`
+- Lists all custom columns with name, label, data type
+- Optional detailed view with display settings
+- Includes usage hints for searching custom columns
+- Commit: e9b3dc4
+
+### 2026-01-19: Add pagination utilities (Phase 2)
+- Created `src/utils/pagination.ts`
+- paginationSchema for reusable limit/offset parameters
+- paginate() helper with PaginationMeta (hasMore, nextOffset)
+- formatPaginationInfo() for human-readable output
+- getCalibredbLimit() for calibredb integration
+- Commit: 39a3011
+
+### 2026-01-19: Add response formatting utility (Phase 2)
+- Created `src/utils/response.ts`
+- ToolResponse interface with success/data/error/summary fields
+- formatSuccess/formatError for uniform responses
+- formatBookList/formatAuthorList/formatTagList helpers
+- parseCalibreBookList for parsing --for-machine JSON
+- Returns both JSON block and human-readable summary
+- Commit: cbc41d3
+
 ### 2026-01-19: Implement search_book_content tool (Phase 2)
 - Created `src/tools/search-book-content.ts`
 - Plain-text fallback when Calibre FTS unavailable
@@ -164,20 +204,20 @@
 - [x] Plain-text fallback for non-indexed content (`search_book_content`)
 
 ### Response Improvements
-- [ ] Structured JSON responses for all tools
-- [ ] Friendly summaries alongside raw data
-- [ ] Pagination for large result sets
+- [x] Structured JSON responses for all tools (`src/utils/response.ts`)
+- [x] Friendly summaries alongside raw data (included in response utility)
+- [x] Pagination for large result sets (`src/utils/pagination.ts`)
 
 ---
 
 ## Phase 3: Write Tools & Maintenance
 
 ### Custom Column Management
-- [ ] `getCustomColumns` - List custom column definitions
-- [ ] `setCustomColumn` - Update custom column value (with destructive annotation)
+- [x] `getCustomColumns` - List custom column definitions
+- [x] `setCustomColumn` - Update custom column value (with destructive annotation)
 
 ### Metadata Editing
-- [ ] `setMetadata` - Update book metadata fields (guarded)
+- [x] `setMetadata` - Update book metadata fields (guarded)
 - [ ] Feature flag for enabling write operations
 
 ### Cleanup & Duplicate Workbench

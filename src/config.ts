@@ -17,6 +17,20 @@ const envSchema = z.object({
     .describe("Friendly name shown in MCP clients")
     .default("Calibre Librarian MCP"),
   CALIBRE_COMMAND_TIMEOUT_MS: z.coerce.number().int().positive().default(15000),
+  CALIBRE_ENABLE_WRITE_OPERATIONS: z
+    .string()
+    .transform((val) => val.toLowerCase() === "true" || val === "1")
+    .default("false")
+    .describe(
+      "Enable write operations (set_metadata, set_custom_column). Disabled by default for safety."
+    ),
+  FAVORITE_SEARCH_ENGINE_URL: z
+    .string()
+    .url()
+    .describe(
+      "Base URL for external book search when titles are missing from Calibre"
+    )
+    .default("https://duckduckgo.com/?q="),
 });
 
 const parsedEnv = envSchema.parse({
@@ -24,6 +38,7 @@ const parsedEnv = envSchema.parse({
   CALIBRE_DB_COMMAND: process.env.CALIBRE_DB_COMMAND,
   MCP_SERVER_NAME: process.env.MCP_SERVER_NAME,
   CALIBRE_COMMAND_TIMEOUT_MS: process.env.CALIBRE_COMMAND_TIMEOUT_MS,
+  FAVORITE_SEARCH_ENGINE_URL: process.env.FAVORITE_SEARCH_ENGINE_URL,
 });
 
 export const config = {
@@ -31,4 +46,5 @@ export const config = {
   calibredbCommand: parsedEnv.CALIBRE_DB_COMMAND,
   serverName: parsedEnv.MCP_SERVER_NAME,
   commandTimeoutMs: parsedEnv.CALIBRE_COMMAND_TIMEOUT_MS,
+  favoriteSearchEngineUrl: parsedEnv.FAVORITE_SEARCH_ENGINE_URL,
 } as const;
