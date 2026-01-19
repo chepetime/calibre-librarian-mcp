@@ -2,6 +2,30 @@
 
 ## Completed Tasks
 
+### 2026-01-19: Implement normalize_author_sort tool (Phase 3)
+- Created `src/tools/normalize-author-sort.ts`
+- Generates expected author_sort format (LastName, FirstName)
+- Handles multiple authors and suffixes (Jr., III)
+- Preview mode by default for safety
+- Optional author ID filter for targeted fixes
+- Commit: bb3f287
+
+### 2026-01-19: Implement quality_report tool (Phase 3)
+- Created `src/tools/quality-report.ts`
+- 8 quality checks: missing cover, tags, description, series, identifiers, publisher, rating, single format
+- Summary table with counts and percentages
+- Detailed lists per category with actionable recommendations
+- Optional check selection
+- Commit: ed9403e
+
+### 2026-01-19: Add merge_duplicates prompt (Phase 3)
+- Created `src/prompts/merge-duplicates.ts`
+- Guided workflow: identify, compare, prepare, update, confirm
+- Optional bookIds and keepId parameters
+- Safety guidelines requiring explicit confirmation
+- References available tools for each step
+- Commit: 7f11e3a
+
 ### 2026-01-19: Implement compare_books tool (Phase 3)
 - Created `src/tools/compare-books.ts`
 - Compare 2-5 books side-by-side in table format
@@ -246,11 +270,11 @@
 ### Cleanup & Duplicate Workbench
 - [x] Duplicate detection helper (`find_duplicates`)
 - [x] Metadata comparison tool (`compare_books`)
-- [ ] Guided merge/retag workflow
-- [ ] Book quality reports (missing covers, formats, metadata gaps)
+- [x] Guided merge/retag workflow (`merge_duplicates` prompt)
+- [x] Book quality reports (`quality_report`)
 
 ### Smart Maintenance Recipes
-- [ ] Normalize author_sort bulk operation
+- [x] Normalize author_sort bulk operation (`normalize_author_sort`)
 - [ ] Bulk retag by pattern
 - [ ] Schedule Calibre maintenance commands
 - [ ] Missing Book Scout - Given a user-provided reading list, attempt to match each title in Calibre; when absent, open Anna’s Archive with the query (e.g., `https://annas-archive.pm/search?q=<book+name>`) so the user can source it quickly.
