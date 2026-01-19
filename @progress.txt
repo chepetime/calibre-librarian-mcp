@@ -2,6 +2,31 @@
 
 ## Completed Tasks
 
+### 2026-01-19: Implement missing_book_scout tool (Phase 3)
+- Created `src/tools/missing-book-scout.ts`
+- Parses reading list ("Title" or "Title by Author" format)
+- Fuzzy title matching by default
+- Reports found vs missing books with match details
+- Generates search URLs for missing titles
+- Multiple search engines: Anna's Archive, Goodreads, Amazon, LibGen
+- Commit: 94139b0
+
+### 2026-01-19: Implement library_maintenance tool (Phase 3)
+- Created `src/tools/library-maintenance.ts`
+- Four operations: check, backup_metadata, embed_metadata, vacuum
+- Extended timeouts for long-running operations
+- Requires write flag for modifying operations
+- Helpful follow-up suggestions after each operation
+- Commit: 8bfaf1a
+
+### 2026-01-19: Implement bulk_retag tool (Phase 3)
+- Created `src/tools/bulk-retag.ts`
+- Three actions: add, remove, replace tags
+- Replace supports old_tag:new_tag format
+- Preview mode by default for safety
+- Uses Calibre search query to target books
+- Commit: 56fbc17
+
 ### 2026-01-19: Implement normalize_author_sort tool (Phase 3)
 - Created `src/tools/normalize-author-sort.ts`
 - Generates expected author_sort format (LastName, FirstName)
@@ -275,9 +300,9 @@
 
 ### Smart Maintenance Recipes
 - [x] Normalize author_sort bulk operation (`normalize_author_sort`)
-- [ ] Bulk retag by pattern
-- [ ] Schedule Calibre maintenance commands
-- [ ] Missing Book Scout - Given a user-provided reading list, attempt to match each title in Calibre; when absent, open Anna’s Archive with the query (e.g., `https://annas-archive.pm/search?q=<book+name>`) so the user can source it quickly.
+- [x] Bulk retag by pattern (`bulk_retag`)
+- [x] Schedule Calibre maintenance commands (`library_maintenance`)
+- [x] Missing Book Scout (`missing_book_scout`) - check reading list against library, generate search links for missing
 
 ---
 
