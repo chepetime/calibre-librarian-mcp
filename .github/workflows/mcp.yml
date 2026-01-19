@@ -1,0 +1,39 @@
+name: MCP
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mcp:
+    name: MCP checks
+    runs-on: ubuntu-latest
+    env:
+      CALIBRE_LIBRARY_PATH: ""
+      CALIBRE_DB_COMMAND: ""
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
+        with:
+          cache-key-suffix: mcp
+          cache-paths: node_modules
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build

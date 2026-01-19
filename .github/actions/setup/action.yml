@@ -1,0 +1,42 @@
+name: Setup Node.js toolchain
+
+description: |
+  Installs pnpm, configures Node.js from .nvmrc, and restores caches for
+  node_modules so downstream workflow steps can focus on lint/build tasks.
+
+inputs:
+  cache-key-suffix:
+    description: Unique suffix per job (e.g., "web" or "api") to keep caches distinct.
+    required: true
+  cache-paths:
+    description: Multiline list of paths to cache (defaults to repo-wide node_modules)
+    required: false
+    default: |
+      node_modules
+
+runs:
+  using: composite
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        run_install: false
+
+    - name: Setup Node.js from .nvmrc
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+        cache: pnpm
+        cache-dependency-path: pnpm-lock.yaml
+
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: ${{ inputs.cache-paths }}
+        key: modules-${{ runner.os }}-${{ inputs.cache-key-suffix }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          modules-${{ runner.os }}-${{ inputs.cache-key-suffix }}-
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
