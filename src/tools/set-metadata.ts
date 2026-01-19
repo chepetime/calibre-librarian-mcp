@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
+import { assertWriteEnabled } from "../config";
 
 export const schema = {
   bookId: z
@@ -75,6 +76,9 @@ export default async function setMetadata({
   comments,
   languages,
 }: InferSchema<typeof schema>): Promise<string> {
+  // Check if write operations are enabled
+  assertWriteEnabled();
+
   // Collect all field updates
   const fields: string[] = [];
 

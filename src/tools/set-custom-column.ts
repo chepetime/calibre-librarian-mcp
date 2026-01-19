@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
+import { assertWriteEnabled } from "../config";
 
 export const schema = {
   bookId: z
@@ -47,6 +48,9 @@ export default async function setCustomColumn({
   value,
   append,
 }: InferSchema<typeof schema>): Promise<string> {
+  // Check if write operations are enabled
+  assertWriteEnabled();
+
   // Remove # prefix if user included it
   const columnName = column.startsWith("#") ? column.slice(1) : column;
 
