@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
+import { invalidateCache } from "../utils/cache";
 import { assertWriteEnabled } from "../config";
 
 export const schema = {
@@ -129,6 +130,9 @@ export default async function setMetadata({
 
   try {
     await runCalibredb(args);
+
+    // Invalidate cache after successful write
+    invalidateCache();
 
     // Build summary of changes
     const changes: string[] = [];

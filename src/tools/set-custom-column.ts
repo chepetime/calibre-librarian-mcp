@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
+import { invalidateCache } from "../utils/cache";
 import { assertWriteEnabled } from "../config";
 
 export const schema = {
@@ -87,6 +88,9 @@ export default async function setCustomColumn({
 
   try {
     await runCalibredb(args);
+
+    // Invalidate cache after successful write
+    invalidateCache();
 
     // Verify the change by reading back the value
     let newValue = value;

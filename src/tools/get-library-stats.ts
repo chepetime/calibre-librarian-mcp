@@ -30,8 +30,11 @@ interface LibraryStats {
 
 async function getTotalBooks(): Promise<number> {
   try {
-    // Get list of all book IDs
-    const output = await runCalibredb(["list", "--fields", "id", "--for-machine"]);
+    // Get list of all book IDs (cached for 60s since this rarely changes)
+    const output = await runCalibredb(["list", "--fields", "id", "--for-machine"], {
+      cache: true,
+      cacheTtlMs: 60_000,
+    });
     if (!output) return 0;
     const books = JSON.parse(output);
     return Array.isArray(books) ? books.length : 0;
@@ -42,7 +45,10 @@ async function getTotalBooks(): Promise<number> {
 
 async function getFormatCounts(): Promise<Record<string, number>> {
   try {
-    const output = await runCalibredb(["list", "--fields", "formats", "--for-machine"]);
+    const output = await runCalibredb(["list", "--fields", "formats", "--for-machine"], {
+      cache: true,
+      cacheTtlMs: 60_000,
+    });
     if (!output) return {};
 
     const books = JSON.parse(output);
@@ -71,8 +77,11 @@ async function getCategoryCounts(
   category: string
 ): Promise<{ total: number; top: Array<{ name: string; count: number }> }> {
   try {
-    // list_categories returns category items with counts
-    const output = await runCalibredb(["list_categories", "--for-machine"]);
+    // list_categories returns category items with counts (cached for 60s)
+    const output = await runCalibredb(["list_categories", "--for-machine"], {
+      cache: true,
+      cacheTtlMs: 60_000,
+    });
     if (!output) return { total: 0, top: [] };
 
     const categories = JSON.parse(output);

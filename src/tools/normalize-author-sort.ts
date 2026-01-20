@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
+import { invalidateCache } from "../utils/cache";
 import { assertWriteEnabled } from "../config";
 
 export const schema = {
@@ -267,6 +268,11 @@ export default async function normalizeAuthorSort({
         lines.push(`✗ **ID ${result.book.id}:** Failed - ${msg}`);
         errorCount++;
       }
+    }
+
+    // Invalidate cache after bulk writes
+    if (successCount > 0) {
+      invalidateCache();
     }
 
     lines.push("");

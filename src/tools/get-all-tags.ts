@@ -37,7 +37,10 @@ export default async function getAllTags({
   sortBy,
   minCount,
 }: InferSchema<typeof schema>): Promise<string> {
-  const output = await runCalibredb(["list_categories", "--for-machine"]);
+  const output = await runCalibredb(["list_categories", "--for-machine"], {
+    cache: true,
+    cacheTtlMs: 60_000,
+  });
 
   if (!output) {
     return "No tags found in the library.";

@@ -1,8 +1,13 @@
 import { spawn } from 'node:child_process';
 import { config } from '../config';
+import { calibreCache, makeCacheKey } from './cache';
 
 interface RunCalibredbOptions {
   timeoutMs?: number;
+  /** Enable caching for this command (default: false) */
+  cache?: boolean;
+  /** Cache TTL in milliseconds (default: 30000) */
+  cacheTtlMs?: number;
 }
 
 export async function runCalibredb(
@@ -10,7 +15,33 @@ export async function runCalibredb(
   options: RunCalibredbOptions = {}
 ): Promise<string> {
   const timeoutMs = options.timeoutMs ?? config.commandTimeoutMs;
+  const useCache = options.cache ?? false;
+  const cacheTtlMs = options.cacheTtlMs ?? 30_000;
 
+  // Check cache first if caching is enabled
+  if (useCache) {
+    const cacheKey = makeCacheKey(args);
+    const cached = calibreCache.get<string>(cacheKey);
+    if (cached !== undefined) {
+      return cached;
+    }
+  }
+
+  const result = await runCalibredbUncached(args, timeoutMs);
+
+  // Store in cache if caching is enabled
+  if (useCache) {
+    const cacheKey = makeCacheKey(args);
+    calibreCache.set(cacheKey, result, cacheTtlMs);
+  }
+
+  return result;
+}
+
+async function runCalibredbUncached(
+  args: string[],
+  timeoutMs: number
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(
       config.calibredbCommand,
