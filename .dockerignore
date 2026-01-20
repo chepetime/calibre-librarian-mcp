@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Build output (will be rebuilt in container)
+dist/
+
+# Development files
+.env
+.env.local
+.env.*.local
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in container)
+*.md
+@*.md
+@*.txt
+
+# MCP development files
+.xmcp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+*.test.ts
+*.spec.ts
+__tests__/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*

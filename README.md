@@ -44,6 +44,55 @@ Model Context Protocol (MCP) server that surfaces your Calibre catalog to Claude
 - **Dev mode**: `pnpm run dev` (watches files and serves MCP over stdio)
 - **Start built server**: `pnpm start` (runs `node dist/stdio.js`)
 
+## Docker
+
+Run the server in a container with Calibre pre-installed.
+
+### Quick Start
+
+```bash
+# Build the image
+docker build -t calibre-librarian-mcp .
+
+# Run with your Calibre library mounted
+docker run -it \
+  -v /path/to/your/calibre/library:/library:ro \
+  -e CALIBRE_LIBRARY_PATH=/library \
+  calibre-librarian-mcp
+```
+
+### Docker Compose
+
+1. Copy and customize `docker-compose.yml`
+2. Set your library path:
+
+   ```bash
+   export CALIBRE_LIBRARY_PATH=/path/to/your/calibre/library
+   docker compose up --build
+   ```
+
+### Claude Desktop with Docker
+
+To use the Docker container with Claude Desktop, configure it to run the container:
+
+```json
+{
+  "mcpServers": {
+    "calibre-librarian": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-v", "/path/to/your/calibre/library:/library:ro",
+        "-e", "CALIBRE_LIBRARY_PATH=/library",
+        "calibre-librarian-mcp"
+      ]
+    }
+  }
+}
+```
+
+**Note:** Remove `:ro` from the volume mount and add `-e CALIBRE_ENABLE_WRITE_OPERATIONS=true` to enable write operations.
+
 ## Configure Claude Desktop
 
 Add the server to `~/Library/Application Support/Claude/mcp.json` (or via the in-app UI). Update the `command`, `args`, and `env` paths to match your machine:

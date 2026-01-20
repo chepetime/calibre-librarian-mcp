@@ -1,0 +1,35 @@
+# Docker Compose configuration for Calibre Librarian MCP
+#
+# Usage:
+#   1. Copy this file and customize paths
+#   2. Run: docker compose up --build
+#
+# For Claude Desktop integration, use the generated config from:
+#   docker compose run --rm calibre-librarian node dist/stdio.js
+
+services:
+  calibre-librarian:
+    build: .
+    container_name: calibre-librarian-mcp
+    stdin_open: true
+    tty: true
+    volumes:
+      # Mount your Calibre library (read-only by default for safety)
+      - ${CALIBRE_LIBRARY_PATH:-/path/to/your/calibre/library}:/library:ro
+    environment:
+      - CALIBRE_LIBRARY_PATH=/library
+      - CALIBRE_DB_COMMAND=calibredb
+      - CALIBRE_COMMAND_TIMEOUT_MS=${CALIBRE_COMMAND_TIMEOUT_MS:-15000}
+      - CALIBRE_ENABLE_WRITE_OPERATIONS=${CALIBRE_ENABLE_WRITE_OPERATIONS:-false}
+      - MCP_SERVER_NAME=${MCP_SERVER_NAME:-Calibre Librarian MCP}
+      - FAVORITE_SEARCH_ENGINE_URL=${FAVORITE_SEARCH_ENGINE_URL:-https://duckduckgo.com/?q=}
+
+# To enable write operations, either:
+# 1. Set CALIBRE_ENABLE_WRITE_OPERATIONS=true in your environment
+# 2. Remove the :ro flag from the volume mount
+#
+# Example with write support:
+#   volumes:
+#     - /path/to/calibre:/library  # no :ro
+#   environment:
+#     - CALIBRE_ENABLE_WRITE_OPERATIONS=true
