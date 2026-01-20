@@ -2,6 +2,14 @@
 
 ## Completed Tasks
 
+### 2026-01-20: Add caching layer for MCP performance (Phase 4)
+- Created `src/utils/cache.ts` with TTL-based in-memory cache
+- Updated calibredb.ts with optional caching support
+- Added 60s cache to `get_library_stats` and `get_all_tags` queries
+- Cache invalidation on write operations (set_metadata, set_custom_column, bulk_retag, normalize_author_sort)
+- Reduces redundant calibredb process spawns for frequently accessed data
+- Commit: acb1655
+
 ### 2026-01-20: Add Docker support (Phase 4)
 - Created multi-stage `Dockerfile` with Node.js 24 and Calibre CLI
 - Created `.dockerignore` to exclude dev files from build
@@ -347,7 +355,7 @@
 - [x] Claude Desktop config generator/helper (`generate_claude_config`)
 - [x] MCP Inspector verification guide (`calibre://docs/inspector-guide` resource)
 - [x] Docker recipe / Dockerfile
-- [ ] Improve MCP performance
+- [x] Improve MCP performance
 - [ ] Improve testing
 - [ ] Improve documentation
 
