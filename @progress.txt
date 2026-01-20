@@ -2,6 +2,32 @@
 
 ## Completed Tasks
 
+### 2026-01-20: Enhance README with full documentation (Phase 4)
+- Comprehensive README.md rewrite
+- Full tool catalog with example calls for all 25+ tools
+- Environment variables reference table
+- Resources section with URIs
+- Troubleshooting guide covering common issues
+- MCP Inspector testing instructions
+- Commit: 3b5a4f5
+
+### 2026-01-19: Add MCP Inspector verification guide (Phase 4)
+- Created `src/resources/inspectorGuide.ts`
+- Resource at calibre://docs/inspector-guide
+- MCP Inspector installation and usage instructions
+- Step-by-step verification with example tool calls
+- Complete tool/resource/prompt checklists
+- Troubleshooting section and success criteria
+- Commit: 198e692
+
+### 2026-01-19: Implement generate_claude_config tool (Phase 4)
+- Created `src/tools/generate-claude-config.ts`
+- Outputs JSON config for claude_desktop_config.json
+- Detects config file path for macOS/Windows/Linux
+- Auto-detects calibredb path per platform
+- Step-by-step setup instructions and troubleshooting
+- Commit: dff9b04
+
 ### 2026-01-19: Implement missing_book_scout tool (Phase 3)
 - Created `src/tools/missing-book-scout.ts`
 - Parses reading list ("Title" or "Title by Author" format)
@@ -310,17 +336,17 @@
 
 ### Platform UX
 - [x] Auto-detect `calibredb` paths (Windows, macOs, linux support)
-- [ ] Claude Desktop config generator/helper
-- [ ] MCP Inspector verification guide
+- [x] Claude Desktop config generator/helper (`generate_claude_config`)
+- [x] MCP Inspector verification guide (`calibre://docs/inspector-guide` resource)
 - [ ] Docker recipe / Dockerfile
 - [ ] Improve MCP performance
 - [ ] Improve testing
 - [ ] Improve documentation
 
 ### Documentation
-- [ ] README.md with full setup instructions
-- [ ] Environment variable reference
-- [ ] Troubleshooting guide
+- [x] README.md with full setup instructions
+- [x] Environment variable reference
+- [x] Troubleshooting guide
 
 ---
 
