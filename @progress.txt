@@ -2,6 +2,14 @@
 
 ## Completed Tasks
 
+### 2026-01-20: Add Docker support (Phase 4)
+- Created multi-stage `Dockerfile` with Node.js 24 and Calibre CLI
+- Created `.dockerignore` to exclude dev files from build
+- Created `docker-compose.yml` for easy local development
+- Updated README with Docker setup instructions
+- Read-only library mounts by default for safety
+- Commit: 7476141
+
 ### 2026-01-20: Enhance README with full documentation (Phase 4)
 - Comprehensive README.md rewrite
 - Full tool catalog with example calls for all 25+ tools
@@ -338,7 +346,7 @@
 - [x] Auto-detect `calibredb` paths (Windows, macOs, linux support)
 - [x] Claude Desktop config generator/helper (`generate_claude_config`)
 - [x] MCP Inspector verification guide (`calibre://docs/inspector-guide` resource)
-- [ ] Docker recipe / Dockerfile
+- [x] Docker recipe / Dockerfile
 - [ ] Improve MCP performance
 - [ ] Improve testing
 - [ ] Improve documentation
