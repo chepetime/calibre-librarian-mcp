@@ -43,6 +43,8 @@ Model Context Protocol (MCP) server that surfaces your Calibre catalog to Claude
 - **Build**: `pnpm run build` (outputs to `dist/`)
 - **Dev mode**: `pnpm run dev` (watches files and serves MCP over stdio)
 - **Start built server**: `pnpm start` (runs `node dist/stdio.js`)
+- **Run tests**: `pnpm test` (runs all unit tests)
+- **Watch tests**: `pnpm test:watch` (runs tests in watch mode)
 
 ## Docker
 
