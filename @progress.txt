@@ -2,6 +2,16 @@
 
 ## Completed Tasks
 
+### 2026-01-20: Add testing infrastructure (Phase 4)
+- Added Vitest as test framework
+- Created `vitest.config.ts` for Node environment
+- Added `src/utils/cache.test.ts` - 20 tests for cache utility
+- Added `src/utils/pagination.test.ts` - 21 tests for pagination utility
+- Added `src/utils/response.test.ts` - 20 tests for response formatting
+- Updated README with test commands
+- Total: 61 unit tests covering core utilities
+- Commit: d3b4fc0
+
 ### 2026-01-20: Add caching layer for MCP performance (Phase 4)
 - Created `src/utils/cache.ts` with TTL-based in-memory cache
 - Updated calibredb.ts with optional caching support
@@ -356,8 +366,8 @@
 - [x] MCP Inspector verification guide (`calibre://docs/inspector-guide` resource)
 - [x] Docker recipe / Dockerfile
 - [x] Improve MCP performance
-- [ ] Improve testing
-- [ ] Improve documentation
+- [x] Improve testing
+- [x] Improve documentation
 
 ### Documentation
 - [x] README.md with full setup instructions
