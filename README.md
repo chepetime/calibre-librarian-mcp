@@ -122,6 +122,15 @@ Prompts use `mcp prompt` instead of `mcp call`. Replace `calibre-librarian` with
 | `library_cleanup` prompt  | `mcp prompt calibre-librarian library_cleanup '{"focus":"missing covers"}'`                              |
 | `search_library` prompt   | `mcp prompt calibre-librarian search_library '{"query":"hopepunk","searchType":"tag"}'`                  |
 
+### Smart Maintenance Recipes
+
+| Tool                    | Example                                                                                                               |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `normalize_author_sort` | `mcp call calibre-librarian normalize_author_sort '{"preview":true,"limit":25}'`                                      |
+| `bulk_retag`            | `mcp call calibre-librarian bulk_retag '{"query":"author:Sanderson","action":"add","tags":"cosmere","preview":true}'` |
+| `library_maintenance`   | `mcp call calibre-librarian library_maintenance '{"operation":"check"}'`                                              |
+| `missing_book_scout`    | `mcp call calibre-librarian missing_book_scout '{"readingList":"Dune\n1984\nThe Hobbit","searchEngine":"annas_archive"}'` |
+
 ### Metadata Editing & Custom Columns _(requires `CALIBRE_ENABLE_WRITE_OPERATIONS=true`)_
 
 | Tool                | Example                                                                                                                      |
@@ -129,4 +138,107 @@ Prompts use `mcp prompt` instead of `mcp call`. Replace `calibre-librarian` with
 | `set_custom_column` | `mcp call calibre-librarian set_custom_column '{"bookId":42,"column":"#reading_status","value":"Started"}'`                  |
 | `set_metadata`      | `mcp call calibre-librarian set_metadata '{"bookId":42,"title":"The Final Empire (Revised)","tags":["cosmere","favorite"]}'` |
 
-These examples cover every MCP feature listed as complete in `@progress.txt`. Adjust IDs, names, and filters to match your own library. Prompts will guide Claude through multi-step workflows, while tools return structured responses that Claude (or you) can interpret directly.
+### Setup & Configuration Tools
+
+| Tool                    | Example                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------ |
+| `generate_claude_config`| `mcp call calibre-librarian generate_claude_config '{"enableWrites":false}'`         |
+
+## Environment Variables
+
+| Variable                         | Required | Default                      | Description                                          |
+| -------------------------------- | -------- | ---------------------------- | ---------------------------------------------------- |
+| `CALIBRE_LIBRARY_PATH`           | Yes      | —                            | Absolute path to your Calibre library directory      |
+| `CALIBRE_DB_COMMAND`             | No       | `calibredb`                  | Path to the `calibredb` executable                   |
+| `CALIBRE_COMMAND_TIMEOUT_MS`     | No       | `15000`                      | Timeout for calibredb commands in milliseconds       |
+| `CALIBRE_ENABLE_WRITE_OPERATIONS`| No       | `false`                      | Enable metadata editing tools (`set_metadata`, etc.) |
+| `FAVORITE_SEARCH_ENGINE_URL`     | No       | `https://duckduckgo.com/?q=` | Base URL for external book search links              |
+| `MCP_SERVER_NAME`                | No       | `Calibre Librarian MCP`      | Server name shown in MCP clients                     |
+
+## Resources
+
+The server exposes these MCP resources:
+
+| URI                              | Description                                    |
+| -------------------------------- | ---------------------------------------------- |
+| `calibre://library/info`         | Library configuration and statistics           |
+| `calibre://library/custom-columns` | Custom column definitions                    |
+| `calibre://docs/inspector-guide` | MCP Inspector verification guide               |
+
+## Troubleshooting
+
+### "calibredb: command not found"
+
+The server can't find the Calibre CLI tools. Solutions:
+
+- **macOS (Homebrew)**: `brew install calibre` or set `CALIBRE_DB_COMMAND=/Applications/calibre.app/Contents/MacOS/calibredb`
+- **macOS (App)**: `CALIBRE_DB_COMMAND=/Applications/calibre.app/Contents/MacOS/calibredb`
+- **Windows**: `CALIBRE_DB_COMMAND=C:\Program Files\Calibre2\calibredb.exe`
+- **Linux**: Install Calibre via package manager, usually adds `calibredb` to PATH
+
+### "Library path does not exist"
+
+Verify your `CALIBRE_LIBRARY_PATH`:
+
+```bash
+# Check the path contains metadata.db
+ls "$CALIBRE_LIBRARY_PATH/metadata.db"
+```
+
+### "Write operations are disabled"
+
+Write tools (`set_metadata`, `set_custom_column`, `bulk_retag` with `preview:false`, etc.) require:
+
+```bash
+CALIBRE_ENABLE_WRITE_OPERATIONS=true
+```
+
+Add this to your `.env` file or Claude Desktop config.
+
+### "Command timed out"
+
+For large libraries, increase the timeout:
+
+```bash
+CALIBRE_COMMAND_TIMEOUT_MS=60000  # 60 seconds
+```
+
+### "Full-text search returns no results"
+
+Calibre FTS must be enabled:
+
+1. Open Calibre
+2. Go to **Preferences → Searching**
+3. Enable **Full text searching**
+4. Click **Re-index all books**
+
+### Server not appearing in Claude Desktop
+
+1. Verify the config file path:
+   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+   - Linux: `~/.config/Claude/claude_desktop_config.json`
+
+2. Check JSON syntax is valid
+
+3. Restart Claude Desktop completely
+
+4. Check Claude Desktop logs for errors
+
+### Testing with MCP Inspector
+
+Use the built-in verification guide:
+
+```bash
+# Start dev server
+npm run dev
+
+# In another terminal, run inspector
+npx @anthropic/mcp-inspector
+```
+
+Or use the `generate_claude_config` tool to get your configuration.
+
+## License
+
+MIT
