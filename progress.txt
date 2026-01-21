@@ -2,6 +2,24 @@
 
 ## Completed Tasks
 
+### 2026-01-21: Add query helper utilities (Phase 5)
+- Created `src/utils/query.ts` with query building utilities
+- `buildFieldQuery()` for Calibre field searches (title/author/tag/series)
+- `buildListArgs()` for calibredb list command construction
+- `buildIdQuery()` and `combineQueries()` for query composition
+- `FIELD_PRESETS` for common field combinations (BASIC, EXTENDED, FULL, etc.)
+- Added `src/utils/query.test.ts` with 35 tests
+- Refactored 6 tools to use the new utilities:
+  - search-books-by-title.ts
+  - get-books-by-author.ts
+  - get-books-by-series.ts
+  - get-books-by-tag.ts
+  - search-books.ts
+  - find-duplicates.ts
+- Reduced ~44 lines of duplicated code
+- Total tests now: 96
+- Commit: f460c6b
+
 ### 2026-01-20: Add testing infrastructure (Phase 4)
 - Added Vitest as test framework
 - Created `vitest.config.ts` for Node environment
@@ -381,7 +399,7 @@
 Refactoring to reduce duplication, improve testability, and make adding new features easier.
 
 ### Utility Extractions (High Priority)
-- [ ] Query helpers - `buildFieldQuery()`, `buildListArgs()` in `src/utils/query.ts`
+- [x] Query helpers - `buildFieldQuery()`, `buildListArgs()` in `src/utils/query.ts`
 - [ ] Book fetching utils - `getBookById<T>()`, `getBooksByIds<T>()` in `src/utils/books.ts`
 
 ### Utility Extractions (Medium Priority)
