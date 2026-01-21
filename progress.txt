@@ -2,6 +2,19 @@
 
 ## Completed Tasks
 
+### 2026-01-21: Add formatNoResults utility (Phase 5)
+- Added `formatNoResults()` to `src/utils/response.ts` for consistent no-results messages
+- Supports entity type, query, field, exact match, context, and suggestion options
+- Added convenience wrappers: `formatNoBooksFound()`, `formatNoAuthorsFound()`, `formatNoTagsFound()`
+- Added 14 new tests for the formatNoResults functions
+- Refactored 4 tools to use the new utilities:
+  - search-books.ts
+  - search-books-by-title.ts
+  - get-books-by-author.ts
+  - get-books-by-tag.ts
+- Total tests now: 157
+- Commit: 8745af9
+
 ### 2026-01-21: Add ebook-convert utility (Phase 5)
 - Created `src/utils/ebook-convert.ts` with conversion utilities
 - `convertToText()` for converting ebook files to plain text
@@ -438,7 +451,7 @@ Refactoring to reduce duplication, improve testability, and make adding new feat
 
 ### Utility Extractions (Medium Priority)
 - [x] ebook-convert wrapper - Extract `convertToText()` to `src/utils/ebook-convert.ts`
-- [ ] Empty result handling - `formatNoResults()` in `src/utils/response.ts`
+- [x] Empty result handling - `formatNoResults()` in `src/utils/response.ts`
 - [ ] Shared schema constants - `LIMITS`, `commonSchemas` in `src/utils/schema.ts`
 - [ ] Category parsing - `parseCategories()`, `parseAuthorsFromCategories()`, `parseTagsFromCategories()`
 
