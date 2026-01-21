@@ -4,7 +4,7 @@ Model Context Protocol (MCP) server that surfaces your Calibre catalog to Claude
 
 [![MCP](https://github.com/chepetime/calibre-librarian-mcp/actions/workflows/mcp.yml/badge.svg)](https://github.com/chepetime/calibre-librarian-mcp/actions/workflows/mcp.yml)
 
-## Prerequisites
+## Requirements
 
 - **Node.js**: `v24.13.0` (auto-managed if you use `nvm use`).
 - **pnpm**: version `10.28.0` or newer.
@@ -14,7 +14,7 @@ Model Context Protocol (MCP) server that surfaces your Calibre catalog to Claude
   - `CALIBRE_DB_COMMAND` – location of the `calibredb` executable (e.g., `/opt/homebrew/bin/calibredb`).
   - `FAVORITE_SEARCH_ENGINE_URL` – base URL used when the server offers external book lookups (defaults to DuckDuckGo: `https://duckduckgo.com/?q=`).
 
-## Installation
+## Setup
 
 1. Clone and enter the repo:
 
@@ -35,69 +35,36 @@ Model Context Protocol (MCP) server that surfaces your Calibre catalog to Claude
    cp .env.example .env
    ```
 
-   Update the variables so the server can reach your Calibre library.
+Update the variables so the server can reach your Calibre library.
 
-## Build & Run
+> The env is just for local development. For Claude Desktop, you'll need to configure the server in the Claude Desktop settings.
 
-- **Type check / lint**: `pnpm run lint`
-- **Build**: `pnpm run build` (outputs to `dist/`)
-- **Dev mode**: `pnpm run dev` (watches files and serves MCP over stdio)
-- **Start built server**: `pnpm start` (runs `node dist/stdio.js`)
-- **Run tests**: `pnpm test` (runs all unit tests)
-- **Watch tests**: `pnpm test:watch` (runs tests in watch mode)
+### Local development workflow
 
-## Docker
+Use these scripts while iterating locally:
 
-Run the server in a container with Calibre pre-installed.
+- `pnpm run dev` – watches files and serves the MCP server over stdio.
+- `pnpm run lint` – type-checks and lints the project.
+- `pnpm test` – runs the full unit test suite once.
+- `pnpm test:watch` – reruns tests whenever source files change.
 
-### Quick Start
+### Build for Claude Desktop (no Docker)
 
-```bash
-# Build the image
-docker build -t calibre-librarian-mcp .
+Follow this flow when you want Claude Desktop (or any MCP client) to run the compiled server directly:
 
-# Run with your Calibre library mounted
-docker run -it \
-  -v /path/to/your/calibre/library:/library:ro \
-  -e CALIBRE_LIBRARY_PATH=/library \
-  calibre-librarian-mcp
-```
-
-### Docker Compose
-
-1. Copy and customize `docker-compose.yml`
-2. Set your library path:
+1. Build the project so `dist/stdio.js` exists:
 
    ```bash
-   export CALIBRE_LIBRARY_PATH=/path/to/your/calibre/library
-   docker compose up --build
+   pnpm run build
    ```
 
-### Claude Desktop with Docker
+2. (Optional) Run the built output locally for a quick smoke test:
 
-To use the Docker container with Claude Desktop, configure it to run the container:
+   ```bash
+   pnpm start  # equivalent to: node dist/stdio.js
+   ```
 
-```json
-{
-  "mcpServers": {
-    "calibre-librarian": {
-      "command": "docker",
-      "args": [
-        "run", "-i", "--rm",
-        "-v", "/path/to/your/calibre/library:/library:ro",
-        "-e", "CALIBRE_LIBRARY_PATH=/library",
-        "calibre-librarian-mcp"
-      ]
-    }
-  }
-}
-```
-
-**Note:** Remove `:ro` from the volume mount and add `-e CALIBRE_ENABLE_WRITE_OPERATIONS=true` to enable write operations.
-
-## Configure Claude Desktop
-
-Add the server to `~/Library/Application Support/Claude/mcp.json` (or via the in-app UI). Update the `command`, `args`, and `env` paths to match your machine:
+3. Configure Claude Desktop by editing `~/Library/Application Support/Claude/claude_desktop_config.json` (or via the in-app UI). Set `command` to `node`, include the absolute path to `dist/stdio.js` as the first `args` entry, and provide the required environment variables:
 
 ```json
 {
@@ -105,6 +72,7 @@ Add the server to `~/Library/Application Support/Claude/mcp.json` (or via the in
   "mcpServers": {
     "calibre-librarian": {
       "command": "node",
+      "args": ["/Users/you/path/to/calibre-librarian-mcp/dist/stdio.js"],
       "env": {
         "CALIBRE_LIBRARY_PATH": "<Absolute path to your>/Calibre",
         "CALIBRE_DB_COMMAND": "/opt/homebrew/bin/calibredb",
@@ -119,9 +87,83 @@ Add the server to `~/Library/Application Support/Claude/mcp.json` (or via the in
 }
 ```
 
-After the config reloads, Claude Desktop will offer the **calibre-librarian** MCP server whenever it launches MCP-enabled conversations.
+After Claude Desktop reloads, it will list **calibre-librarian** as an available MCP server whenever MCP-enabled conversations start.
+
+### Docker deployment
+
+Run the server in a container with Calibre pre-installed when you prefer an isolated environment.
+
+#### Quick start
+
+```bash
+# Build the image
+docker build -t calibre-librarian-mcp .
+
+# Run with your Calibre library mounted
+docker run -it \
+  -v /path/to/your/calibre/library:/library:ro \
+  -e CALIBRE_LIBRARY_PATH=/library \
+  calibre-librarian-mcp
+```
+
+#### Docker Compose
+
+1. Copy and customize `docker-compose.yml`.
+2. Set your library path and launch the stack:
+
+   ```bash
+   export CALIBRE_LIBRARY_PATH=/path/to/your/calibre/library
+   docker compose up --build
+   ```
+
+#### Claude Desktop with Docker
+
+To let Claude Desktop run the container directly, point it at `docker run`:
+
+```json
+{
+  "mcpServers": {
+    "calibre-librarian": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-v",
+        "/path/to/your/calibre/library:/library:ro",
+        "-e",
+        "CALIBRE_LIBRARY_PATH=/library",
+        "calibre-librarian-mcp"
+      ]
+    }
+  }
+}
+```
+
+**Note:** Remove `:ro` from the volume mount and add `-e CALIBRE_ENABLE_WRITE_OPERATIONS=true` to enable write operations.
 
 ## Tool Catalog & Examples
+
+### Installing the MCP CLI
+
+The examples below use the `mcp` CLI published by Anthropic. Install (or run) it with any of the following options:
+
+- Global install (recommended if you call MCP tools frequently):
+
+  ```bash
+  npm install -g @anthropic-ai/mcp-cli
+  # now `mcp --help` should work
+  ```
+
+- One-off execution without a global install:
+
+  ```bash
+  npx @anthropic-ai/mcp-cli --help
+  # or
+  pnpm dlx @anthropic-ai/mcp-cli --help
+  ```
+
+### CLI usage
 
 All tools can be invoked from MCP Inspector or the CLI:
 
@@ -129,7 +171,13 @@ All tools can be invoked from MCP Inspector or the CLI:
 mcp call calibre-librarian <toolName> '<json payload>'
 ```
 
-Prompts use `mcp prompt` instead of `mcp call`. Replace `calibre-librarian` with the name you configured in `mcp.json`.
+Prompts (e.g., `merge_duplicates`, `library_cleanup`, `search_library`) use the companion command:
+
+```bash
+mcp prompt calibre-librarian library_cleanup '{"focus":"missing covers"}'
+```
+
+Swap `library_cleanup` for any prompt listed below, and replace `calibre-librarian` with the server name you configured in `mcp.json`.
 
 ### Library Overview & Metadata
 
@@ -175,14 +223,16 @@ Prompts use `mcp prompt` instead of `mcp call`. Replace `calibre-librarian` with
 
 ### Smart Maintenance Recipes
 
-| Tool                    | Example                                                                                                               |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `normalize_author_sort` | `mcp call calibre-librarian normalize_author_sort '{"preview":true,"limit":25}'`                                      |
-| `bulk_retag`            | `mcp call calibre-librarian bulk_retag '{"query":"author:Sanderson","action":"add","tags":"cosmere","preview":true}'` |
-| `library_maintenance`   | `mcp call calibre-librarian library_maintenance '{"operation":"check"}'`                                              |
+| Tool                    | Example                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `normalize_author_sort` | `mcp call calibre-librarian normalize_author_sort '{"preview":true,"limit":25}'`                                          |
+| `bulk_retag`            | `mcp call calibre-librarian bulk_retag '{"query":"author:Sanderson","action":"add","tags":"cosmere","preview":true}'`     |
+| `library_maintenance`   | `mcp call calibre-librarian library_maintenance '{"operation":"check"}'`                                                  |
 | `missing_book_scout`    | `mcp call calibre-librarian missing_book_scout '{"readingList":"Dune\n1984\nThe Hobbit","searchEngine":"annas_archive"}'` |
 
-### Metadata Editing & Custom Columns _(requires `CALIBRE_ENABLE_WRITE_OPERATIONS=true`)_
+### Metadata Editing & Custom Columns
+
+> Requires `CALIBRE_ENABLE_WRITE_OPERATIONS=true`
 
 | Tool                | Example                                                                                                                      |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -191,30 +241,30 @@ Prompts use `mcp prompt` instead of `mcp call`. Replace `calibre-librarian` with
 
 ### Setup & Configuration Tools
 
-| Tool                    | Example                                                                              |
-| ----------------------- | ------------------------------------------------------------------------------------ |
-| `generate_claude_config`| `mcp call calibre-librarian generate_claude_config '{"enableWrites":false}'`         |
+| Tool                     | Example                                                                      |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| `generate_claude_config` | `mcp call calibre-librarian generate_claude_config '{"enableWrites":false}'` |
 
 ## Environment Variables
 
-| Variable                         | Required | Default                      | Description                                          |
-| -------------------------------- | -------- | ---------------------------- | ---------------------------------------------------- |
-| `CALIBRE_LIBRARY_PATH`           | Yes      | —                            | Absolute path to your Calibre library directory      |
-| `CALIBRE_DB_COMMAND`             | No       | `calibredb`                  | Path to the `calibredb` executable                   |
-| `CALIBRE_COMMAND_TIMEOUT_MS`     | No       | `15000`                      | Timeout for calibredb commands in milliseconds       |
-| `CALIBRE_ENABLE_WRITE_OPERATIONS`| No       | `false`                      | Enable metadata editing tools (`set_metadata`, etc.) |
-| `FAVORITE_SEARCH_ENGINE_URL`     | No       | `https://duckduckgo.com/?q=` | Base URL for external book search links              |
-| `MCP_SERVER_NAME`                | No       | `Calibre Librarian MCP`      | Server name shown in MCP clients                     |
+| Variable                          | Required | Default                      | Description                                          |
+| --------------------------------- | -------- | ---------------------------- | ---------------------------------------------------- |
+| `CALIBRE_LIBRARY_PATH`            | Yes      | —                            | Absolute path to your Calibre library directory      |
+| `CALIBRE_DB_COMMAND`              | No       | `calibredb`                  | Path to the `calibredb` executable                   |
+| `CALIBRE_COMMAND_TIMEOUT_MS`      | No       | `15000`                      | Timeout for calibredb commands in milliseconds       |
+| `CALIBRE_ENABLE_WRITE_OPERATIONS` | No       | `false`                      | Enable metadata editing tools (`set_metadata`, etc.) |
+| `FAVORITE_SEARCH_ENGINE_URL`      | No       | `https://duckduckgo.com/?q=` | Base URL for external book search links              |
+| `MCP_SERVER_NAME`                 | No       | `Calibre Librarian MCP`      | Server name shown in MCP clients                     |
 
 ## Resources
 
 The server exposes these MCP resources:
 
-| URI                              | Description                                    |
-| -------------------------------- | ---------------------------------------------- |
-| `calibre://library/info`         | Library configuration and statistics           |
-| `calibre://library/custom-columns` | Custom column definitions                    |
-| `calibre://docs/inspector-guide` | MCP Inspector verification guide               |
+| URI                                | Description                          |
+| ---------------------------------- | ------------------------------------ |
+| `calibre://library/info`           | Library configuration and statistics |
+| `calibre://library/custom-columns` | Custom column definitions            |
+| `calibre://docs/inspector-guide`   | MCP Inspector verification guide     |
 
 ## Troubleshooting
 

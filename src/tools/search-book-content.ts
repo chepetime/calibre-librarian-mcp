@@ -4,33 +4,16 @@ import type { InferSchema } from "xmcp";
 import { config } from "../config";
 import { getBookWithFormats } from "../utils/books";
 import { convertToText, selectBestFormat } from "../utils/ebook-convert";
+import { commonSchemas } from "../utils/schema";
 
 export const schema = {
-  bookId: z
-    .number()
-    .int()
-    .positive()
-    .describe("Calibre book ID to search within."),
+  bookId: commonSchemas.bookIdForSearch,
   query: z
     .string()
     .min(1)
     .describe("Text to search for within the book content. Case-insensitive."),
-  contextChars: z
-    .number()
-    .int()
-    .positive()
-    .max(500)
-    .default(150)
-    .describe(
-      "Characters of context to show around each match (default: 150)."
-    ),
-  maxMatches: z
-    .number()
-    .int()
-    .positive()
-    .max(20)
-    .default(10)
-    .describe("Maximum number of matches to return (default: 10, max: 20)."),
+  contextChars: commonSchemas.contextChars,
+  maxMatches: commonSchemas.maxMatches,
 };
 
 export const metadata = {
