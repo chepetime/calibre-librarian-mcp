@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
-import { runCalibredb } from "../utils/calibredb";
+import { getBooksByIds } from "../utils/books";
 
 export const schema = {
   bookIds: z
@@ -73,27 +73,7 @@ const ALL_FIELDS = [
   "comments",
 ] as const;
 
-async function getBookMetadata(bookId: number): Promise<BookMetadata | null> {
-  try {
-    const output = await runCalibredb([
-      "list",
-      "--fields",
-      "id,title,authors,series,series_index,tags,publisher,pubdate,rating,formats,identifiers,languages,comments",
-      "--search",
-      `id:${bookId}`,
-      "--for-machine",
-    ]);
-
-    if (!output) return null;
-
-    const books = JSON.parse(output);
-    if (!Array.isArray(books) || books.length === 0) return null;
-
-    return books[0] as BookMetadata;
-  } catch {
-    return null;
-  }
-}
+const BOOK_FIELDS = "id,title,authors,series,series_index,tags,publisher,pubdate,rating,formats,identifiers,languages,comments";
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined || value === "") {
@@ -125,17 +105,9 @@ export default async function compareBooks({
   fields,
 }: InferSchema<typeof schema>): Promise<string> {
   // Fetch metadata for all books
-  const books: BookMetadata[] = [];
-  const notFound: number[] = [];
-
-  for (const id of bookIds) {
-    const metadata = await getBookMetadata(id);
-    if (metadata) {
-      books.push(metadata);
-    } else {
-      notFound.push(id);
-    }
-  }
+  const { books, notFound } = await getBooksByIds<BookMetadata>(bookIds, {
+    fields: BOOK_FIELDS,
+  });
 
   if (notFound.length > 0) {
     return `Book(s) not found: ${notFound.join(", ")}`;

@@ -6,8 +6,8 @@ import { join } from "node:path";
 import { readFile, unlink } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 
-import { runCalibredb } from "../utils/calibredb";
 import { config } from "../config";
+import { getBookWithFormats } from "../utils/books";
 
 export const schema = {
   bookId: z
@@ -49,46 +49,9 @@ export const metadata = {
   },
 };
 
-interface BookInfo {
-  id: number;
-  title: string;
-  authors: string;
-  formats: string[];
-}
-
 interface Match {
   position: number;
   snippet: string;
-}
-
-async function getBookInfo(bookId: number): Promise<BookInfo | null> {
-  try {
-    const output = await runCalibredb([
-      "list",
-      "--fields",
-      "id,title,authors,formats",
-      "--search",
-      `id:${bookId}`,
-      "--for-machine",
-    ]);
-
-    if (!output) return null;
-
-    const books = JSON.parse(output);
-    if (!Array.isArray(books) || books.length === 0) return null;
-
-    const book = books[0];
-    const formatPaths = book.formats ? book.formats.split(", ") : [];
-
-    return {
-      id: book.id,
-      title: book.title,
-      authors: book.authors,
-      formats: formatPaths,
-    };
-  } catch {
-    return null;
-  }
 }
 
 function getFormatExtension(path: string): string {
@@ -176,7 +139,7 @@ export default async function searchBookContent({
   maxMatches,
 }: InferSchema<typeof schema>): Promise<string> {
   // Get book info
-  const bookInfo = await getBookInfo(bookId);
+  const bookInfo = await getBookWithFormats(bookId);
 
   if (!bookInfo) {
     return `Book not found with ID: ${bookId}`;

@@ -4,6 +4,7 @@ import type { InferSchema } from "xmcp";
 import { runCalibredb } from "../utils/calibredb";
 import { invalidateCache } from "../utils/cache";
 import { assertWriteEnabled } from "../config";
+import { bookExists } from "../utils/books";
 
 export const schema = {
   bookId: z
@@ -56,28 +57,11 @@ export default async function setCustomColumn({
   const columnName = column.startsWith("#") ? column.slice(1) : column;
 
   // First, verify the book exists and get its title
-  let bookTitle = `Book ID ${bookId}`;
-  try {
-    const bookOutput = await runCalibredb([
-      "list",
-      "--fields",
-      "id,title",
-      "--search",
-      `id:${bookId}`,
-      "--for-machine",
-    ]);
-
-    if (bookOutput) {
-      const books = JSON.parse(bookOutput);
-      if (Array.isArray(books) && books.length > 0) {
-        bookTitle = books[0].title || bookTitle;
-      } else {
-        return `Book not found with ID: ${bookId}`;
-      }
-    }
-  } catch {
-    // Continue anyway, calibredb set_custom will fail if book doesn't exist
+  const book = await bookExists(bookId);
+  if (!book) {
+    return `Book not found with ID: ${bookId}`;
   }
+  const bookTitle = book.title;
 
   // Build the set_custom command
   const args = ["set_custom", columnName, String(bookId), value];

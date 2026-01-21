@@ -2,7 +2,8 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
-import { buildListArgs, buildIdQuery } from "../utils/query";
+import { buildListArgs } from "../utils/query";
+import { getBookById as getBookByIdUtil } from "../utils/books";
 
 export const schema = {
   mode: z
@@ -115,27 +116,7 @@ async function getAllBooks(): Promise<Book[]> {
 }
 
 async function getBookById(bookId: number): Promise<Book | null> {
-  const output = await runCalibredb(
-    buildListArgs({
-      fields: "DUPLICATES",
-      search: buildIdQuery(bookId),
-      forMachine: true,
-    })
-  );
-
-  if (!output) return null;
-
-  const books = JSON.parse(output);
-  if (!Array.isArray(books) || books.length === 0) return null;
-
-  const b = books[0];
-  return {
-    id: b.id,
-    title: b.title,
-    authors: b.authors,
-    identifiers: b.identifiers,
-    formats: b.formats,
-  };
+  return getBookByIdUtil<Book>(bookId, { fields: "DUPLICATES" });
 }
 
 function findDuplicatesByTitle(

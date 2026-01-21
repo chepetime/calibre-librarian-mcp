@@ -4,6 +4,7 @@ import type { InferSchema } from "xmcp";
 import { runCalibredb } from "../utils/calibredb";
 import { invalidateCache } from "../utils/cache";
 import { assertWriteEnabled } from "../config";
+import { bookExists } from "../utils/books";
 
 export const schema = {
   bookId: z
@@ -98,28 +99,11 @@ export default async function setMetadata({
   }
 
   // First, get current book info for comparison
-  let bookTitle = `Book ID ${bookId}`;
-  try {
-    const bookOutput = await runCalibredb([
-      "list",
-      "--fields",
-      "id,title,authors",
-      "--search",
-      `id:${bookId}`,
-      "--for-machine",
-    ]);
-
-    if (bookOutput) {
-      const books = JSON.parse(bookOutput);
-      if (Array.isArray(books) && books.length > 0) {
-        bookTitle = books[0].title || bookTitle;
-      } else {
-        return `Book not found with ID: ${bookId}`;
-      }
-    }
-  } catch {
-    // Continue anyway
+  const book = await bookExists(bookId);
+  if (!book) {
+    return `Book not found with ID: ${bookId}`;
   }
+  const bookTitle = book.title;
 
   // Build the set_metadata command
   const args = ["set_metadata", String(bookId)];
