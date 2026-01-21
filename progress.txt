@@ -2,6 +2,21 @@
 
 ## Completed Tasks
 
+### 2026-01-21: Add ebook-convert utility (Phase 5)
+- Created `src/utils/ebook-convert.ts` with conversion utilities
+- `convertToText()` for converting ebook files to plain text
+- `getFormatExtension()` for extracting file extensions
+- `selectBestFormat()` for choosing optimal format for text extraction
+- `getAvailableFormats()` for listing available formats
+- `TEXT_FRIENDLY_FORMATS` constant for format priority order
+- Added `src/utils/ebook-convert.test.ts` with 22 tests
+- Refactored 2 tools to use the new utilities:
+  - fetch-excerpt.ts
+  - search-book-content.ts
+- Reduced ~113 lines of duplicated ebook conversion code
+- Total tests now: 143
+- Commit: 8be769e
+
 ### 2026-01-21: Add book fetching utilities (Phase 5)
 - Created `src/utils/books.ts` with book fetching utilities
 - `getBookById<T>()` for fetching single books with configurable fields
@@ -422,7 +437,7 @@ Refactoring to reduce duplication, improve testability, and make adding new feat
 - [x] Book fetching utils - `getBookById<T>()`, `getBooksByIds<T>()` in `src/utils/books.ts`
 
 ### Utility Extractions (Medium Priority)
-- [ ] ebook-convert wrapper - Extract `convertToText()` to `src/utils/ebook-convert.ts`
+- [x] ebook-convert wrapper - Extract `convertToText()` to `src/utils/ebook-convert.ts`
 - [ ] Empty result handling - `formatNoResults()` in `src/utils/response.ts`
 - [ ] Shared schema constants - `LIMITS`, `commonSchemas` in `src/utils/schema.ts`
 - [ ] Category parsing - `parseCategories()`, `parseAuthorsFromCategories()`, `parseTagsFromCategories()`
