@@ -1,8 +1,14 @@
 # Calibre Librarian MCP Server
 
+[![MCP](https://github.com/chepetime/calibre-librarian-mcp/actions/workflows/mcp.yml/badge.svg)](https://github.com/chepetime/calibre-librarian-mcp/actions/workflows/mcp.yml)
+
 Model Context Protocol (MCP) server that surfaces your Calibre catalog to Claude via xmcp.
 
-[![MCP](https://github.com/chepetime/calibre-librarian-mcp/actions/workflows/mcp.yml/badge.svg)](https://github.com/chepetime/calibre-librarian-mcp/actions/workflows/mcp.yml)
+<!-- markdownlint-disable MD033 -->
+<p align="center">
+  <img src="assets/mcp-calibre.png" alt="Claude MCP view of Calibre Librarian" width="420" />
+</p>
+<!-- markdownlint-enable MD033 -->
 
 ## Requirements
 
