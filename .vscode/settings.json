@@ -1,0 +1,76 @@
+{
+  "tailwindCSS.experimental.configFile": "packages/ui/src/styles/globals.css",
+  "eslint.workingDirectories": [{ "mode": "auto" }, "!packages/eslint-config"],
+  "editor.minimap.enabled": false,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "eslint.enable": true,
+
+  // Faster search in workspaces with symlinks (common with package managers)
+  "search.followSymlinks": false,
+
+  // Use workspace TS everywhere to avoid version mismatches across packages
+  "typescript.tsdk": "node_modules/typescript/lib",
+
+  "files.exclude": {
+    "**/.vscode": true,
+    "**/.turbo": true,
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/coverage": true,
+    "**/build": true,
+    "**/out": true,
+    "**/tmp": true,
+    "**/logs": true,
+    "**/yarn.lock": true,
+    ".github": true,
+    ".vscode": true,
+    ".xmcp": true,
+    "xmcp-env.d.ts": true,
+    ".dockerignore": true,
+    ".gitignore": true,
+    "pnpm-lock.yaml": true,
+    ".claude": true,
+    ".opencode": true
+  },
+  "search.exclude": {
+    "**/.vscode": true,
+    "**/.turbo": true,
+    "**/dist": true,
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/coverage": true,
+    "**/build": true,
+    "**/out": true,
+    "**/tmp": true,
+    "**/logs": true,
+    "**/yarn.lock": true,
+    ".github": true,
+    ".vscode": true,
+    ".xmcp": true,
+    "xmcp-env.d.ts": true,
+    ".dockerignore": true,
+    ".gitignore": true,
+    "pnpm-lock.yaml": true,
+    ".claude": true,
+    ".opencode": true
+  },
+
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+
+  "editor.defaultFormatter": null,
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+    "source.organizeImports": "never"
+  }
+}
