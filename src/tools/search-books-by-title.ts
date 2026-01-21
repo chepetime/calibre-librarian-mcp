@@ -3,6 +3,7 @@ import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
 import { buildFieldQuery, buildListArgs } from "../utils/query";
+import { formatNoBooksFound } from "../utils/response";
 
 export const schema = {
   title: z
@@ -66,9 +67,7 @@ export default async function searchBooksByTitle({
   const output = await runCalibredb(args);
 
   if (!output) {
-    return exact
-      ? `No books found with exact title: "${title}"`
-      : `No books found matching title pattern: "${title}"`;
+    return formatNoBooksFound(title, "title", exact);
   }
 
   return output;

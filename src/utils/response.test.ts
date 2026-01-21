@@ -6,6 +6,10 @@ import {
   formatAuthorList,
   formatTagList,
   parseCalibreBookList,
+  formatNoResults,
+  formatNoBooksFound,
+  formatNoAuthorsFound,
+  formatNoTagsFound,
   type BookResult,
   type AuthorResult,
   type TagResult,
@@ -235,5 +239,122 @@ describe("parseCalibreBookList", () => {
 
     expect(result).toHaveLength(3);
     expect(result.map((b) => b.id)).toEqual([1, 2, 3]);
+  });
+});
+
+describe("formatNoResults", () => {
+  it("should format basic no results message", () => {
+    const result = formatNoResults({ entityType: "books" });
+
+    expect(result).toBe("No books found in the library.");
+  });
+
+  it("should format message with query", () => {
+    const result = formatNoResults({ entityType: "books", query: "tolkien" });
+
+    expect(result).toBe('No books found matching: "tolkien"');
+  });
+
+  it("should format message with field and query", () => {
+    const result = formatNoResults({
+      entityType: "books",
+      query: "tolkien",
+      field: "author",
+    });
+
+    expect(result).toBe('No books found matching author: "tolkien"');
+  });
+
+  it("should format message with exact match", () => {
+    const result = formatNoResults({
+      entityType: "books",
+      query: "The Hobbit",
+      field: "title",
+      exact: true,
+    });
+
+    expect(result).toBe('No books found with exact title: "The Hobbit"');
+  });
+
+  it("should include context when provided", () => {
+    const result = formatNoResults({
+      entityType: "tags",
+      context: "The library may not have any tags defined.",
+    });
+
+    expect(result).toContain("No tags found in the library.");
+    expect(result).toContain("The library may not have any tags defined.");
+  });
+
+  it("should include suggestion when provided", () => {
+    const result = formatNoResults({
+      entityType: "books",
+      query: "asdf",
+      field: "title",
+      suggestion: "Try a different search term.",
+    });
+
+    expect(result).toContain('No books found matching title: "asdf"');
+    expect(result).toContain("Try a different search term.");
+  });
+
+  it("should work with different entity types", () => {
+    expect(formatNoResults({ entityType: "authors" })).toBe(
+      "No authors found in the library."
+    );
+    expect(formatNoResults({ entityType: "tags" })).toBe(
+      "No tags found in the library."
+    );
+    expect(formatNoResults({ entityType: "series" })).toBe(
+      "No series found in the library."
+    );
+    expect(formatNoResults({ entityType: "results" })).toBe(
+      "No results found in the library."
+    );
+    expect(formatNoResults({ entityType: "matches" })).toBe(
+      "No matches found in the library."
+    );
+  });
+});
+
+describe("formatNoBooksFound", () => {
+  it("should format basic message", () => {
+    expect(formatNoBooksFound()).toBe("No books found in the library.");
+  });
+
+  it("should format message with query and field", () => {
+    expect(formatNoBooksFound("Sanderson", "author")).toBe(
+      'No books found matching author: "Sanderson"'
+    );
+  });
+
+  it("should format exact match message", () => {
+    expect(formatNoBooksFound("Dune", "title", true)).toBe(
+      'No books found with exact title: "Dune"'
+    );
+  });
+});
+
+describe("formatNoAuthorsFound", () => {
+  it("should format basic message", () => {
+    expect(formatNoAuthorsFound()).toBe("No authors found in the library.");
+  });
+
+  it("should format message with query", () => {
+    expect(formatNoAuthorsFound("Smith")).toBe(
+      'No authors found matching name: "Smith"'
+    );
+  });
+});
+
+describe("formatNoTagsFound", () => {
+  it("should format basic message", () => {
+    expect(formatNoTagsFound()).toBe("No tags found in the library.");
+  });
+
+  it("should format message with query", () => {
+    expect(formatNoTagsFound("fiction")).toBe(
+      'No tags found matching pattern: "fiction"'
+    );
   });
 });

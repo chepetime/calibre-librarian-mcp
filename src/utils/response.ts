@@ -170,6 +170,125 @@ export function formatTagList(
 }
 
 /**
+ * Entity types for no-results messages.
+ */
+export type EntityType = "books" | "authors" | "tags" | "series" | "results" | "matches";
+
+/**
+ * Options for formatting no-results messages.
+ */
+export interface NoResultsOptions {
+  /**
+   * The type of entity that wasn't found.
+   */
+  entityType: EntityType;
+
+  /**
+   * The search query or filter that was used.
+   */
+  query?: string;
+
+  /**
+   * The field that was searched (e.g., "title", "author", "tag").
+   */
+  field?: string;
+
+  /**
+   * Whether the search was an exact match.
+   */
+  exact?: boolean;
+
+  /**
+   * Additional context to include in the message.
+   */
+  context?: string;
+
+  /**
+   * A suggestion for what to do next.
+   */
+  suggestion?: string;
+}
+
+/**
+ * Format a "no results" message with consistent structure.
+ *
+ * @param options - Configuration for the message
+ * @returns Formatted no-results message
+ *
+ * @example
+ * formatNoResults({ entityType: "books", query: "tolkien", field: "author" })
+ * // Returns: 'No books found matching author: "tolkien"'
+ *
+ * formatNoResults({ entityType: "tags" })
+ * // Returns: 'No tags found in the library.'
+ *
+ * formatNoResults({
+ *   entityType: "books",
+ *   query: "The Hobbit",
+ *   field: "title",
+ *   exact: true
+ * })
+ * // Returns: 'No books found with exact title: "The Hobbit"'
+ */
+export function formatNoResults(options: NoResultsOptions): string {
+  const { entityType, query, field, exact, context, suggestion } = options;
+
+  let message: string;
+
+  if (query && field) {
+    // Field-specific search with query
+    if (exact) {
+      message = `No ${entityType} found with exact ${field}: "${query}"`;
+    } else {
+      message = `No ${entityType} found matching ${field}: "${query}"`;
+    }
+  } else if (query) {
+    // General search with query
+    message = `No ${entityType} found matching: "${query}"`;
+  } else {
+    // No query - library-wide search
+    message = `No ${entityType} found in the library.`;
+  }
+
+  // Add context if provided
+  if (context) {
+    message += `\n\n${context}`;
+  }
+
+  // Add suggestion if provided
+  if (suggestion) {
+    message += `\n\n${suggestion}`;
+  }
+
+  return message;
+}
+
+/**
+ * Convenience function for "no books found" messages.
+ */
+export function formatNoBooksFound(
+  query?: string,
+  field?: string,
+  exact?: boolean
+): string {
+  return formatNoResults({ entityType: "books", query, field, exact });
+}
+
+/**
+ * Convenience function for "no authors found" messages.
+ */
+export function formatNoAuthorsFound(query?: string): string {
+  return formatNoResults({ entityType: "authors", query, field: query ? "name" : undefined });
+}
+
+/**
+ * Convenience function for "no tags found" messages.
+ */
+export function formatNoTagsFound(query?: string): string {
+  return formatNoResults({ entityType: "tags", query, field: query ? "pattern" : undefined });
+}
+
+/**
  * Parse calibredb list output (--for-machine JSON format) into BookResult array.
  */
 export function parseCalibreBookList(jsonOutput: string): BookResult[] {

@@ -3,6 +3,7 @@ import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
 import { buildFieldQuery, buildListArgs } from "../utils/query";
+import { formatNoBooksFound } from "../utils/response";
 
 export const schema = {
   tag: z
@@ -66,9 +67,7 @@ export default async function getBooksByTag({
   const output = await runCalibredb(args);
 
   if (!output) {
-    return exact
-      ? `No books found with tag: "${tag}"`
-      : `No books found matching tag pattern: "${tag}"`;
+    return formatNoBooksFound(tag, "tag", exact);
   }
 
   // Add a header to the output

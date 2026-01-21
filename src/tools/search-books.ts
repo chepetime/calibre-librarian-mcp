@@ -3,6 +3,7 @@ import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
 import { buildListArgs } from "../utils/query";
+import { formatNoResults } from "../utils/response";
 
 export const schema = {
   query: z
@@ -57,7 +58,7 @@ export default async function searchBooks({
   const output = await runCalibredb(args);
 
   if (!output) {
-    return `No books found matching query: "${query}"`;
+    return formatNoResults({ entityType: "books", query });
   }
 
   return output;
