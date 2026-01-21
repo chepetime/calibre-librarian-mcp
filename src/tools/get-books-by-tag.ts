@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
+import { buildFieldQuery, buildListArgs } from "../utils/query";
 
 export const schema = {
   tag: z
@@ -52,26 +53,15 @@ export default async function getBooksByTag({
   sortBy,
   ascending,
 }: InferSchema<typeof schema>): Promise<string> {
-  // Build the Calibre query
-  // ~pattern means "contains" in Calibre search
-  // =pattern means "equals" (exact match)
-  const query = exact ? `tag:"=${tag}"` : `tag:"~${tag}"`;
+  const query = buildFieldQuery("tag", tag, exact);
 
-  const args = [
-    "list",
-    "--fields",
-    "id,title,authors,tags,series,series_index,formats",
-    "--search",
-    query,
-    "--sort-by",
+  const args = buildListArgs({
+    fields: "id,title,authors,tags,series,series_index,formats",
+    search: query,
     sortBy,
-    "--limit",
-    String(limit),
-  ];
-
-  if (ascending) {
-    args.push("--ascending");
-  }
+    ascending,
+    limit,
+  });
 
   const output = await runCalibredb(args);
 

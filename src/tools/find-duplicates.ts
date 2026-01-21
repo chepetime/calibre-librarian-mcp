@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
+import { buildListArgs, buildIdQuery } from "../utils/query";
 
 export const schema = {
   mode: z
@@ -94,12 +95,12 @@ function normalizeTitle(title: string): string {
 }
 
 async function getAllBooks(): Promise<Book[]> {
-  const output = await runCalibredb([
-    "list",
-    "--fields",
-    "id,title,authors,identifiers,formats",
-    "--for-machine",
-  ]);
+  const output = await runCalibredb(
+    buildListArgs({
+      fields: "DUPLICATES",
+      forMachine: true,
+    })
+  );
 
   if (!output) return [];
 
@@ -114,14 +115,13 @@ async function getAllBooks(): Promise<Book[]> {
 }
 
 async function getBookById(bookId: number): Promise<Book | null> {
-  const output = await runCalibredb([
-    "list",
-    "--fields",
-    "id,title,authors,identifiers,formats",
-    "--search",
-    `id:${bookId}`,
-    "--for-machine",
-  ]);
+  const output = await runCalibredb(
+    buildListArgs({
+      fields: "DUPLICATES",
+      search: buildIdQuery(bookId),
+      forMachine: true,
+    })
+  );
 
   if (!output) return null;
 

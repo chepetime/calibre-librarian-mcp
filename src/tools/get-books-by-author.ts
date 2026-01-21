@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
+import { buildFieldQuery, buildListArgs } from "../utils/query";
 
 export const schema = {
   author: z
@@ -52,26 +53,15 @@ export default async function getBooksByAuthor({
   sortBy,
   ascending,
 }: InferSchema<typeof schema>): Promise<string> {
-  // Build the Calibre query
-  // ~pattern means "contains" in Calibre search
-  // =pattern means "equals" (exact match)
-  const query = exact ? `author:"=${author}"` : `author:"~${author}"`;
+  const query = buildFieldQuery("author", author, exact);
 
-  const args = [
-    "list",
-    "--fields",
-    "id,title,authors,series,series_index,tags,pubdate,formats",
-    "--search",
-    query,
-    "--sort-by",
-    sortBy === "series" ? "series" : sortBy,
-    "--limit",
-    String(limit),
-  ];
-
-  if (ascending) {
-    args.push("--ascending");
-  }
+  const args = buildListArgs({
+    fields: "EXTENDED",
+    search: query,
+    sortBy: sortBy === "series" ? "series" : sortBy,
+    ascending,
+    limit,
+  });
 
   const output = await runCalibredb(args);
 

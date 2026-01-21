@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { InferSchema } from "xmcp";
 
 import { runCalibredb } from "../utils/calibredb";
+import { buildListArgs } from "../utils/query";
 
 export const schema = {
   query: z
@@ -45,21 +46,13 @@ export default async function searchBooks({
   sortBy,
   ascending,
 }: InferSchema<typeof schema>) {
-  const args = [
-    "list",
-    "--fields",
-    "id,title,authors,tags,series,formats",
-    "--search",
-    query,
-    "--sort-by",
+  const args = buildListArgs({
+    fields: "BASIC",
+    search: query,
     sortBy,
-    "--limit",
-    String(limit),
-  ];
-
-  if (ascending) {
-    args.push("--ascending");
-  }
+    ascending,
+    limit,
+  });
 
   const output = await runCalibredb(args);
 
