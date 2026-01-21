@@ -2,6 +2,25 @@
 
 ## Completed Tasks
 
+### 2026-01-21: Add book fetching utilities (Phase 5)
+- Created `src/utils/books.ts` with book fetching utilities
+- `getBookById<T>()` for fetching single books with configurable fields
+- `getBooksByIds<T>()` for batch fetching with not-found tracking
+- `bookExists()` for quick existence checks
+- `getBookWithFormats()` for content extraction tools
+- `getBookTitle()` for logging and error messages
+- Added `src/utils/books.test.ts` with 25 tests
+- Refactored 6 tools to use the new utilities:
+  - compare-books.ts
+  - fetch-excerpt.ts
+  - search-book-content.ts
+  - set-custom-column.ts
+  - set-metadata.ts
+  - find-duplicates.ts
+- Reduced ~152 lines of duplicated book fetching code
+- Total tests now: 121
+- Commit: 21b19d4
+
 ### 2026-01-21: Add query helper utilities (Phase 5)
 - Created `src/utils/query.ts` with query building utilities
 - `buildFieldQuery()` for Calibre field searches (title/author/tag/series)
@@ -400,7 +419,7 @@ Refactoring to reduce duplication, improve testability, and make adding new feat
 
 ### Utility Extractions (High Priority)
 - [x] Query helpers - `buildFieldQuery()`, `buildListArgs()` in `src/utils/query.ts`
-- [ ] Book fetching utils - `getBookById<T>()`, `getBooksByIds<T>()` in `src/utils/books.ts`
+- [x] Book fetching utils - `getBookById<T>()`, `getBooksByIds<T>()` in `src/utils/books.ts`
 
 ### Utility Extractions (Medium Priority)
 - [ ] ebook-convert wrapper - Extract `convertToText()` to `src/utils/ebook-convert.ts`
