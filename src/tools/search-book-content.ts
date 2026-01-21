@@ -1,13 +1,9 @@
 import { z } from "zod";
 import type { InferSchema } from "xmcp";
-import { spawn } from "node:child_process";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { readFile, unlink } from "node:fs/promises";
-import { randomUUID } from "node:crypto";
 
 import { config } from "../config";
 import { getBookWithFormats } from "../utils/books";
+import { convertToText, selectBestFormat } from "../utils/ebook-convert";
 
 export const schema = {
   bookId: z
@@ -52,48 +48,6 @@ export const metadata = {
 interface Match {
   position: number;
   snippet: string;
-}
-
-function getFormatExtension(path: string): string {
-  return path.split(".").pop()?.toLowerCase() || "";
-}
-
-async function convertToText(
-  inputPath: string,
-  timeoutMs: number
-): Promise<string> {
-  const outputPath = join(tmpdir(), `calibre-search-${randomUUID()}.txt`);
-
-  return new Promise((resolve, reject) => {
-    const child = spawn("ebook-convert", [inputPath, outputPath], {
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-
-    const timer = setTimeout(() => {
-      child.kill("SIGTERM");
-      reject(new Error(`ebook-convert timed out after ${timeoutMs}ms`));
-    }, timeoutMs);
-
-    child.on("error", (error) => {
-      clearTimeout(timer);
-      reject(error);
-    });
-
-    child.on("close", async (code) => {
-      clearTimeout(timer);
-      if (code === 0) {
-        try {
-          const text = await readFile(outputPath, "utf8");
-          await unlink(outputPath).catch(() => {});
-          resolve(text);
-        } catch (err) {
-          reject(err);
-        }
-      } else {
-        reject(new Error(`ebook-convert exited with code ${code}`));
-      }
-    });
-  });
 }
 
 function findMatches(
@@ -150,22 +104,17 @@ export default async function searchBookContent({
   }
 
   // Select best format for text extraction
-  const preferenceOrder = ["epub", "txt", "mobi", "azw3", "pdf"];
-  let selectedPath: string | null = null;
-
-  for (const fmt of preferenceOrder) {
-    selectedPath =
-      bookInfo.formats.find((p) => getFormatExtension(p) === fmt) || null;
-    if (selectedPath) break;
-  }
+  const selectedPath = selectBestFormat(bookInfo.formats);
 
   if (!selectedPath) {
-    selectedPath = bookInfo.formats[0];
+    return `No suitable format available for text extraction in "${bookInfo.title}"`;
   }
 
   try {
     // Convert to text
-    const fullText = await convertToText(selectedPath, config.commandTimeoutMs);
+    const fullText = await convertToText(selectedPath, {
+      timeoutMs: config.commandTimeoutMs,
+    });
 
     // Search for matches
     const matches = findMatches(fullText, query, contextChars, maxMatches);

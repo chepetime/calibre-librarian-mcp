@@ -1,13 +1,14 @@
 import { z } from "zod";
 import type { InferSchema } from "xmcp";
-import { spawn } from "node:child_process";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { readFile, unlink } from "node:fs/promises";
-import { randomUUID } from "node:crypto";
 
 import { config } from "../config";
-import { getBookWithFormats, type BookWithFormats } from "../utils/books";
+import { getBookWithFormats } from "../utils/books";
+import {
+  convertToText,
+  getFormatExtension,
+  selectBestFormat,
+  getAvailableFormats,
+} from "../utils/ebook-convert";
 
 export const schema = {
   bookId: z
@@ -44,51 +45,7 @@ export const metadata = {
   },
 };
 
-// BookWithFormats is imported from ../utils/books
-
-function getFormatExtension(path: string): string {
-  const ext = path.split(".").pop()?.toLowerCase() || "";
-  return ext;
-}
-
-async function convertToText(
-  inputPath: string,
-  timeoutMs: number
-): Promise<string> {
-  const outputPath = join(tmpdir(), `calibre-excerpt-${randomUUID()}.txt`);
-
-  return new Promise((resolve, reject) => {
-    const child = spawn("ebook-convert", [inputPath, outputPath], {
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-
-    const timer = setTimeout(() => {
-      child.kill("SIGTERM");
-      reject(new Error(`ebook-convert timed out after ${timeoutMs}ms`));
-    }, timeoutMs);
-
-    child.on("error", (error) => {
-      clearTimeout(timer);
-      reject(error);
-    });
-
-    child.on("close", async (code) => {
-      clearTimeout(timer);
-      if (code === 0) {
-        try {
-          const text = await readFile(outputPath, "utf8");
-          // Clean up temp file
-          await unlink(outputPath).catch(() => {});
-          resolve(text);
-        } catch (err) {
-          reject(err);
-        }
-      } else {
-        reject(new Error(`ebook-convert exited with code ${code}`));
-      }
-    });
-  });
-}
+// Utilities imported from ../utils/ebook-convert
 
 export default async function fetchExcerpt({
   bookId,
@@ -107,39 +64,20 @@ export default async function fetchExcerpt({
   }
 
   // Select format to use
-  let selectedPath: string | null = null;
+  const selectedPath = selectBestFormat(bookInfo.formats, preferredFormat);
 
-  if (preferredFormat) {
-    selectedPath =
-      bookInfo.formats.find(
-        (p) => getFormatExtension(p) === preferredFormat.toLowerCase()
-      ) || null;
-
-    if (!selectedPath) {
-      const availableFormats = bookInfo.formats
-        .map((p) => getFormatExtension(p).toUpperCase())
-        .join(", ");
-      return `Format "${preferredFormat}" not available. Available formats: ${availableFormats}`;
-    }
-  } else {
-    // Prefer text-friendly formats
-    const preferenceOrder = ["epub", "txt", "mobi", "azw3", "pdf"];
-    for (const fmt of preferenceOrder) {
-      selectedPath =
-        bookInfo.formats.find((p) => getFormatExtension(p) === fmt) || null;
-      if (selectedPath) break;
-    }
-    // Fall back to first available
-    if (!selectedPath) {
-      selectedPath = bookInfo.formats[0];
-    }
+  if (!selectedPath) {
+    const availableFormats = getAvailableFormats(bookInfo.formats).join(", ");
+    return `Format "${preferredFormat}" not available. Available formats: ${availableFormats}`;
   }
 
   const formatUsed = getFormatExtension(selectedPath).toUpperCase();
 
   try {
     // Convert to text
-    const fullText = await convertToText(selectedPath, config.commandTimeoutMs);
+    const fullText = await convertToText(selectedPath, {
+      timeoutMs: config.commandTimeoutMs,
+    });
 
     // Trim to max characters
     let excerpt = fullText.slice(0, maxChars);
